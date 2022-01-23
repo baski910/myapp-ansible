@@ -32,6 +32,7 @@
       gcp_compute_subnetwork:
         name: gcp-ansible-subnet
         region: us-central1
+        network: "{{ network }}"
         ip_cidr_range: "{{ ip_cidr_range }}"
         project: "{{ gcp_project }}"
         auth_kind: "{{ gcp_cred_kind }}"
