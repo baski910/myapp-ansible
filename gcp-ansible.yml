@@ -47,7 +47,7 @@
         - ip_protocol: tcp
           ports: ['80','22']
         target_tags:
-          - gcp_ansible
+        - gcp_ansible
         source_ranges: ['0.0.0.0/0']
         project: "{{ gcp_project }}"
         auth_kind: "{{ gcp_cred_kind }}"
