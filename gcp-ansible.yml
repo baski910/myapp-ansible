@@ -44,7 +44,7 @@
         network: "{{ network }}"
         allowed:
         - ip_protocol: tcp
-          ports: ['80,'22']
+          ports: ['80','22']
         target_tags:
           - gcp_ansible
         source_ranges: ['0.0.0.0/0']
@@ -83,6 +83,7 @@
         project: "{{ gcp_project }}"
         auth_kind: "{{ gcp_cred_kind }}"
         state: present
+
     - name: Show RHEL8 Instance Details
       debug:
         msg: "The RHEL8 instance is accessible at {{ address.address }}"
