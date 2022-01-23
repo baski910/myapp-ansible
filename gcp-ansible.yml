@@ -2,12 +2,15 @@
 - name: Create a GCP instance
   hosts: localhost
   vars:
+     instance_name: gcp-ansible
      gcp_project: polar-outlet-308708
      gcp_cred_kind: serviceaccount
+     ip_cidr_range: 172.16.0.0/28
+
   tasks:
     - name: create a disk mapped from RHEL8 image
       gcp_compute_disk:
-        name: disk-instance
+        name: "{{ instance_name }}"
         size_gb: 50
         source_image: projects/rhel-cloud/global/images/rhel-8-v20190905
         zone: us-central1-a
@@ -19,14 +22,40 @@
     - name: create a  VPC network
       gcp_compute_network:
         name: network-instance
+        auto_create_subnetworks: yes
         project: "{{ gcp_project }}"
         auth_kind: "{{ gcp_cred_kind }}"
         state: present
       register: network
 
+    - name: Create subnet within above VPC network
+      gcp_compute_subnetwork:
+        name: gcp-ansible-subnet
+        region: us-central1
+        ip_cidr_range: "{{ ip_cidr_range }}"
+        project: "{{ gcp_project }}"
+        auth_kind: "{{ gcp_cred_kind }}"
+        state: present
+      register: subnet
+
+    - name: Create firewall rule to allow port 80 and 22 for all source IPs
+      gcp_compute_firewall:
+        name: ansible-firewall
+        network: "{{ network }}"
+        allowed:
+        - ip_protocol: tcp
+          ports: ['80,'22']
+        target_tags:
+          - gcp_ansible
+        source_ranges: ['0.0.0.0/0']
+        project: "{{ gcp_project }}"
+        auth_kind: "{{ gcp_cred_kind }}"
+        state: present
+      register: firewall
+
     - name: create an IPv4 public IP Address
       gcp_compute_address:
-        name: address-instance
+        name: "{{ instance_name }}"
         region: us-central1
         project: "{{ gcp_project }}"
         auth_kind: "{{ gcp_cred_kind }}"
@@ -48,6 +77,9 @@
             nat_ip: "{{ address }}"
             type: ONE_TO_ONE_NAT
         zone: us-central1-a
+        tags:
+          items:
+            - gcp-ansible
         project: "{{ gcp_project }}"
         auth_kind: "{{ gcp_cred_kind }}"
         state: present
