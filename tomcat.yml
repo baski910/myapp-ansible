@@ -1,5 +1,5 @@
 ---
-- hosts: webhost1
+- hosts: all
   tasks:
     - name: Install Open JDK
       yum: name=openjdk-11-jre-headless state=present
