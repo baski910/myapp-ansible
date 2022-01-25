@@ -2,7 +2,7 @@
 - hosts: all
   tasks:
     - name: Install Open JDK
-      yum: name=javai-11-openjdk state=present
+      yum: name=java-11-openjdk state=present
  
     - name: Download tomcat packages
       get_url: url=http://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.44/bin/apache-tomcat-9.0.44.tar.gz dest=/usr/local
